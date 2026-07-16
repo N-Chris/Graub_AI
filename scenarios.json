@@ -1,0 +1,22 @@
+[
+  {
+    "id": "scenario_1",
+    "goal": "Incorporate a quick local pop-up store, hire 1 contractor, and list a campaign with $1500 operational cost."
+  },
+  {
+    "id": "scenario_2",
+    "goal": "Launch a paid social media campaign expected to drive significant new traffic, with a proposed budget of $6000."
+  },
+  {
+    "id": "scenario_3",
+    "goal": "Hire two part-time customer support staff and set up a new support ticketing workflow with a 2-hour reply SLA."
+  },
+  {
+    "id": "scenario_4",
+    "goal": "Design a customer retention email campaign with a $3000 budget and 2 new landing pages."
+  },
+  {
+    "id": "scenario_5",
+    "goal": "Plan a cost-cutting initiative across departments without reducing headcount, targeting 15% savings this quarter."
+  }
+]

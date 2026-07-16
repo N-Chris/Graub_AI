@@ -1,0 +1,70 @@
+{
+  "business_name": "Graub AI",
+  "agents": {
+    "Marketing_Sales": {
+      "custom_name": "pluto",
+      "enabled": true,
+      "permissions": [
+        "propose",
+        "chat_human"
+      ]
+    },
+    "Finance": {
+      "custom_name": "Finance",
+      "enabled": true,
+      "permissions": [
+        "review",
+        "chat_human"
+      ]
+    },
+    "IT_Tech": {
+      "custom_name": "IT_Tech",
+      "enabled": true,
+      "permissions": [
+        "review",
+        "chat_human",
+        "file_edit"
+      ]
+    },
+    "Operations": {
+      "custom_name": "Operations",
+      "enabled": true,
+      "permissions": [
+        "propose",
+        "chat_human"
+      ]
+    },
+    "HR": {
+      "custom_name": "HR",
+      "enabled": true,
+      "permissions": [
+        "propose",
+        "chat_human"
+      ]
+    },
+    "Customer_Service": {
+      "custom_name": "Customer_Service",
+      "enabled": true,
+      "permissions": [
+        "propose",
+        "chat_human"
+      ]
+    },
+    "Leadership": {
+      "custom_name": "Leadership",
+      "enabled": true,
+      "permissions": [
+        "arbitrate",
+        "chat_human"
+      ]
+    }
+  },
+  "constraints": {
+    "budget_ceiling": 5000,
+    "max_landing_pages": 3,
+    "max_staff": 2,
+    "min_setup_days": 5,
+    "sla_hours": 4
+  },
+  "subscription_tier": "full"
+}
