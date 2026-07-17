@@ -3,7 +3,7 @@
 
 Graub AI is an agency of specialist AI agents that run the seven core functions of a small business — Marketing & Sales, Finance, IT/Technology, Operations, HR, Customer Service, and Leadership. Each agent is a junior-level assistant to a human expert in that domain: it drafts, reviews, and handles the repetitive day-to-day work, but every consequential action still passes through a human before it's approved, and a further separate human step before it's published/executed. Agents negotiate with each other through bounded rounds when they disagree, and escalate to a human Leadership authority when they can't resolve it themselves.
 
-**Judging this? Start here: [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md) — a 5-minute orientation.**
+**Judging this? Start here: [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md) — a 5-minute orientation.** Full write-up: [`docs/PROJECT_DESCRIPTION.md`](docs/PROJECT_DESCRIPTION.md).
 
 ## Why Track 3
 
