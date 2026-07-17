@@ -17,8 +17,8 @@ def review_proposal(task_id, proposal_text, client_config):
     for amount in dollar_amounts:
         if amount > ceiling:
             reason = f"Programmatic Budget Overrun Exception: Detected an asset costing ${amount}, which violates our strict ${ceiling} ceiling."
-            log_message(task_id, "Finance", "Marketing_Sales", "critique", reason, ["budget_ceiling"])
-            return {"verdict": "critique", "reason": reason}
+            log_message(task_id, "Finance", "Marketing_Sales", "critique", reason, ["budget_ceiling"], risk_level="high")
+            return {"verdict": "critique", "reason": reason, "risk_level": "high"}
 
     system_prompt = (
         f"You are {agent_name}, the Finance Agent for {biz_name}. You are a junior-level assistant "
@@ -27,8 +27,10 @@ def review_proposal(task_id, proposal_text, client_config):
         f"Your hard constraints are a strict maximum budget ceiling of ${ceiling} "
         f"and maintaining positive short-term cash flow. Review the incoming proposal. "
         f"If it looks expensive or fails to declare clear ROI tracking, you MUST issue a 'critique' requesting cost cutting. "
+        f"Also rate the overall financial risk of this proposal as 'low', 'medium', or 'high' — even proposals you accept "
+        f"can carry real risk worth flagging to the human. "
         f"Output your response strictly in this JSON format structure, with no wrapper brackets outside the main object:\n"
-        f'{{"verdict": "accept" or "critique", "reason": "Your detailed evaluation metrics or objections"}}'
+        f'{{"verdict": "accept" or "critique", "reason": "Your detailed evaluation metrics or objections", "risk_level": "low" or "medium" or "high"}}'
     )
 
     memory_block = business_memory.get_memory_context(client_id, domain="Finance")
@@ -49,11 +51,13 @@ def review_proposal(task_id, proposal_text, client_config):
             
         verdict = result.get("verdict", "accept")
         reason = result.get("reason", "Financial parameter confirmation cleared via consensus.")
+        risk_level = result.get("risk_level", "medium")
     except (ConnectionError, RuntimeError):
         raise
     except json.JSONDecodeError as e:
         verdict = "critique"
         reason = f"System validation failure reading finance structural response: {str(e)}"
+        risk_level = "medium"
         
-    log_message(task_id, "Finance", "Marketing_Sales", verdict, reason, ["budget_ceiling"])
-    return {"verdict": verdict, "reason": reason}
+    log_message(task_id, "Finance", "Marketing_Sales", verdict, reason, ["budget_ceiling"], risk_level=risk_level)
+    return {"verdict": verdict, "reason": reason, "risk_level": risk_level}

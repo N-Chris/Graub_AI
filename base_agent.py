@@ -80,7 +80,7 @@ class BaseDomainAgent:
             print(f" ⚠️ Recovery Path: Model returned malformed JSON. Falling back to explicit structured critique.")
             result = {"verdict": "critique", "reason": f"System validation failure reading formatting string: {str(e)}"}
             
-        log_message(task_id, custom_name, "All", result["verdict"], result["reason"], [f"{self.internal_id}_rule_check"])
+        log_message(task_id, custom_name, "All", result["verdict"], result["reason"], [f"{self.internal_id}_rule_check"], risk_level=result.get("risk_level", "medium"))
         return result
 
     def adapt_proposal(self, task_id, original_proposal, critique_reason, client_config):

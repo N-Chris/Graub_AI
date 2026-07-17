@@ -75,8 +75,10 @@ def review_proposal(task_id, proposal_text, client_config):
         f"Your hard constraint: Maximum technical capacity of {max_pages} active landing pages or simultaneous deployments. "
         f"Review the incoming proposal. If it demands overly complex systems architectures, unprotected data storage, "
         f"or more than {max_pages} landing pages, you MUST issue a 'critique' requesting simplification. "
+        f"Also rate the overall technical/security risk as 'low', 'medium', or 'high' — even proposals you accept "
+        f"can carry real risk worth flagging to the human. "
         f"Output your response strictly in this JSON format structure, with no wrapper brackets outside the main object:\n"
-        f'{{"verdict": "accept" or "critique", "reason": "Your specific technical infrastructure objections"}}'
+        f'{{"verdict": "accept" or "critique", "reason": "Your specific technical infrastructure objections", "risk_level": "low" or "medium" or "high"}}'
     )
 
     memory_block = business_memory.get_memory_context(client_id, domain="IT_Tech")
@@ -99,11 +101,13 @@ def review_proposal(task_id, proposal_text, client_config):
         # Ensure fallback keys exist to prevent dictionary mapping errors
         verdict = result.get("verdict", "accept")
         reason = result.get("reason", "Technical feasibility clearance provided by default mapping path.")
+        risk_level = result.get("risk_level", "medium")
     except (ConnectionError, RuntimeError):
         raise
     except json.JSONDecodeError as e:
         verdict = "critique"
         reason = f"System validation failure reading IT structural response: {str(e)}"
+        risk_level = "medium"
         
-    log_message(task_id, "IT_Tech", "Marketing_Sales", verdict, reason, ["technical_feasibility"])
-    return {"verdict": verdict, "reason": reason}
+    log_message(task_id, "IT_Tech", "Marketing_Sales", verdict, reason, ["technical_feasibility"], risk_level=risk_level)
+    return {"verdict": verdict, "reason": reason, "risk_level": risk_level}

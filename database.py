@@ -39,9 +39,13 @@ def init_db():
             constraints_referenced TEXT,
             confidence REAL,
             timestamp TEXT,
-            resolution_level INTEGER DEFAULT 1
+            resolution_level INTEGER DEFAULT 1,
+            risk_level TEXT
         )
     ''')
+    existing_msg_cols = [row[1] for row in cursor.execute("PRAGMA table_info(messages)").fetchall()]
+    if "risk_level" not in existing_msg_cols:
+        cursor.execute("ALTER TABLE messages ADD COLUMN risk_level TEXT")
 
     # Business Memory Table — durable, growing institutional knowledge per client.
     # 'observation' rows are cheap, automatic, one-line facts logged after every
@@ -63,14 +67,14 @@ def init_db():
     conn.commit()
     conn.close()
 
-def log_message(task_id, from_agent, to_agent, msg_type, content, constraints=None, confidence=1.0, resolution_level=1):
+def log_message(task_id, from_agent, to_agent, msg_type, content, constraints=None, confidence=1.0, resolution_level=1, risk_level=None):
     """Securely writes interaction frames into our local relational audit log file."""
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO messages (task_id, from_agent, to_agent, type, content, constraints_referenced, confidence, timestamp, resolution_level)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (task_id, from_agent, str(to_agent), msg_type, content, json.dumps(constraints or []), confidence, datetime.utcnow().isoformat(), resolution_level))
+        INSERT INTO messages (task_id, from_agent, to_agent, type, content, constraints_referenced, confidence, timestamp, resolution_level, risk_level)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (task_id, from_agent, str(to_agent), msg_type, content, json.dumps(constraints or []), confidence, datetime.utcnow().isoformat(), resolution_level, risk_level))
     conn.commit()
     conn.close()
 

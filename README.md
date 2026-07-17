@@ -3,6 +3,8 @@
 
 Graub AI is an agency of specialist AI agents that run the seven core functions of a small business — Marketing & Sales, Finance, IT/Technology, Operations, HR, Customer Service, and Leadership. Each agent is a junior-level assistant to a human expert in that domain: it drafts, reviews, and handles the repetitive day-to-day work, but every consequential action still passes through a human before it's approved, and a further separate human step before it's published/executed. Agents negotiate with each other through bounded rounds when they disagree, and escalate to a human Leadership authority when they can't resolve it themselves.
 
+**Judging this? Start here: [`docs/JUDGE_GUIDE.md`](docs/JUDGE_GUIDE.md) — a 5-minute orientation.**
+
 ## Why Track 3
 
 Graub AI's value is specifically in how the agents divide labor and disagree with each other — not in one agent autonomously finishing a task end to end. The Orchestrator decomposes goals across seven distinct specialist agents; Finance and IT independently audit every proposal against hard, programmatically-enforced constraints; agents negotiate through up to two bounded rounds; and unresolved conflicts escalate to a human Leadership authority. A working single-agent baseline (`baseline_single_agent.py`) is run against identical scenarios to measure the actual efficiency gain — see `run_comparison.py`.
@@ -127,6 +129,15 @@ This is genuinely cumulative — the more tasks that run, the more memory accumu
 
 ## Setup
 
+**Fastest path:** `bash setup.sh` handles the venv, dependencies, and `.env` scaffolding in one step. Then:
+```bash
+nano .env                    # add DASHSCOPE_API_KEY
+python test_connection.py    # confirm Qwen Cloud is reachable
+python seed_demo.py          # populate real demo history, one task deliberately left pending
+python web_ui.py             # http://localhost:5002
+```
+
+**Manual path:**
 1. Clone the repo and create a virtual environment:
    ```bash
    python -m venv .venv
@@ -189,6 +200,23 @@ Each failing step prints a specific, targeted explanation and next action. In sh
 **If timeouts happen specifically when calling the API (not on `network_diagnostic.py`'s basic checks):** `qwen3.7-plus` has extended "thinking" mode on by default, and in non-streaming mode the API sends back nothing until that entire hidden reasoning phase finishes — easily 30-60+ seconds by itself. `config.py` now explicitly sends `"enable_thinking": false`, which should resolve this. If you still see timeouts after pulling this update, that confirms it's a genuine network-path issue rather than model latency, and the VPN/antivirus/proxy steps above are the next thing to try.
 
 **If local development stays flaky:** once deployed to Alibaba Cloud ECS — which the hackathon requires anyway — server-to-server calls to Qwen Cloud run on/near Alibaba's own network and are unlikely to hit the same path issues your local machine might. A rough local connection doesn't necessarily block the deployed demo.
+
+## Friends' Additional Ideas — What Got Built, What's Roadmap
+
+A later brainstorming pass ("Boardroom AI — Enhanced Concept") suggested a batch of extra features. Here's the honest mapping, so it's clear what's real vs. aspirational:
+
+| Idea | Status |
+|---|---|
+| Dynamic agent selection | **Built** — already covered above (`/setup`, enabled/disabled per agent) |
+| Company memory | **Built** — `business_memory.py` |
+| Confidence voting | **Built** — every logged message already carried a `confidence` score; it just wasn't shown anywhere. Now rendered as a bar on the Task Timeline. |
+| Risk analysis | **Built** — Finance, IT_Tech, and the base-class reviewers now rate every verdict `low`/`medium`/`high`, shown as a colored dot next to each review and on the timeline. |
+| Explainable reasoning | **Built** — every verdict already came with a `reason`; now paired with its risk rating and viewable in full sequence on `/task/<task_id>`. |
+| UI: goal → orchestrator → agents → conflicts → negotiation → approval | **Built** — the new Task Timeline (`/task/<task_id>`) shows exactly this, chronologically, for any real task. Linked from the Dashboard's recent activity and every Review Activity row. |
+| Company knowledge base | **Built** — `/insights` now lists every real file a human has approved and published through IT_Tech, pulled straight from `client_workspace/`. |
+| Department KPIs | **Partially built** — the Dashboard's per-agent table (pending/ready/reviews) is a first pass; deeper metrics (approval rate over time, avg. negotiation rounds by domain) are a natural next iteration. |
+| Business simulation before approval | **Roadmap** — genuinely a separate, larger feature (a real "what happens if we approve this" forecasting engine) than the remaining build window allows to do well. |
+| Integrations (Slack, Teams, Gmail, QuickBooks, Shopify, CRM, Analytics) | **Roadmap** — each is a real OAuth/API integration project on its own; listed here as the natural next phase once the core governance loop (already built) is proven. |
 
 ## Deployment
 

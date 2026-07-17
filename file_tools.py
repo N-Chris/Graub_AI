@@ -58,3 +58,24 @@ def apply_file_edit(relative_path: str, new_content: str) -> str:
     with open(path, "w", encoding="utf-8") as f:
         f.write(new_content)
     return path
+
+
+def list_workspace_files() -> list:
+    """Read-only listing of every real file currently in the sandboxed workspace —
+    this is the 'company knowledge base' view: every document an agent has ever
+    actually published, in one place."""
+    files = []
+    for root, _, filenames in os.walk(ALLOWED_DIR):
+        for name in filenames:
+            if name == "README.md" and root == ALLOWED_DIR:
+                continue  # the workspace's own explanatory readme, not a real document
+            full = os.path.join(root, name)
+            rel = os.path.relpath(full, ALLOWED_DIR)
+            try:
+                size = os.path.getsize(full)
+                mtime = os.path.getmtime(full)
+            except OSError:
+                continue
+            files.append((rel, size, mtime))
+    files.sort(key=lambda f: f[2], reverse=True)
+    return files
