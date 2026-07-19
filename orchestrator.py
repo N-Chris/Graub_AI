@@ -1,5 +1,6 @@
 import sqlite3
 import json
+import uuid
 from config import qwen_request, DB_FILE
 
 def orchestrator_decompose(goal: str, client_config: dict):
@@ -60,9 +61,18 @@ def orchestrator_decompose(goal: str, client_config: dict):
             ]
         }
     
+    # The model labels subtasks "T1", "T2"... with no awareness of any other run —
+    # two separate calls to this function (e.g. two scenarios in run_comparison.py)
+    # would otherwise both produce "T1", silently merging unrelated tasks' messages
+    # together under one task_id and corrupting anything that counts per-task
+    # activity (negotiation-round counts, the Task Timeline view, etc). Prefixing
+    # with a short run-scoped token guarantees every subtask id is globally unique.
+    run_token = uuid.uuid4().hex[:6]
+
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     for subtask in data.get("subtasks", []):
+        subtask["task_id"] = f"{run_token}-{subtask['task_id']}"
         target_domain = subtask['domain'] if subtask['domain'] in active_domains else "Marketing_Sales"
         
         cursor.execute('''
