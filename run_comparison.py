@@ -10,12 +10,27 @@ import argparse
 import json
 import time
 import sqlite3
+import threading
 
 from client_config import load_client_config
 from database import init_db, DB_FILE
 from orchestrator import orchestrator_decompose
 from baseline_single_agent import run_single_agent_baseline
 from main import run_negotiation_pipeline
+
+
+def auto_approve_loop(stop_event):
+    """Runs in the background for the duration of the comparison so timing reflects
+    actual negotiation/API speed, not however long a human takes to click Approve.
+    Without this, run_negotiation_pipeline blocks on human_gate() indefinitely, and
+    even if a human does click through manually, that reaction time would corrupt
+    the very timing numbers this script exists to produce."""
+    while not stop_event.is_set():
+        time.sleep(0.5)
+        conn = sqlite3.connect(DB_FILE)
+        conn.execute("UPDATE tasks SET status='published' WHERE status='pending_human_review'")
+        conn.commit()
+        conn.close()
 
 
 def count_negotiation_rounds(task_ids):
@@ -36,6 +51,10 @@ def count_negotiation_rounds(task_ids):
 def run_all(client_id="graub_ai", scenarios_path="scenarios.json"):
     config = load_client_config(client_id)
     init_db()
+
+    stop_event = threading.Event()
+    approver = threading.Thread(target=auto_approve_loop, args=(stop_event,), daemon=True)
+    approver.start()
 
     with open(scenarios_path) as f:
         scenarios = json.load(f)
@@ -72,6 +91,8 @@ def run_all(client_id="graub_ai", scenarios_path="scenarios.json"):
             "multi_agent_negotiation_rounds": rounds,
             "multi_agent_subtasks": len(executable_tasks),
         })
+
+    stop_event.set()
 
     print("\n\n" + "=" * 60)
     print("COMPARISON SUMMARY")

@@ -10,19 +10,25 @@ Two separate pieces of evidence — a terminal screenshot or a browser screensho
 
 ## Instance Details
 - **Service used:** Alibaba Cloud ECS (Elastic Compute Service)
-- **Region:** _[fill in]_
-- **Instance ID / public IP:** _[fill in]_
+- **Region:** China (Hong Kong)
+- **Instance ID:** i-j6c12usttl4umkx8hb5m
+- **Instance type:** ecs.c8y.small (1 vCPU, 2 GiB)
+- **Public IP:** 8.218.50.36
+- **Status:** Running (confirmed live — see screenshot below)
 
 ## Proof Link
-`https://github.com/N-Chris/Graub_AI/blob/main/config.py` (or a commit-pinned permalink if you want it locked to a specific version)
+`https://github.com/N-Chris/Graub_AI/blob/main/config.py` — `ENDPOINT_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions"`
 
 ## Steps Taken
 1. `git clone https://github.com/N-Chris/Graub_AI.git`
-2. `bash setup.sh` (or manual venv + `pip install -r requirements.txt`)
-3. Created `.env` directly on the instance (never committed to git)
-4. Ran `python main.py --client graub_ai` and `python web_ui.py` on the instance
-5. Confirmed reachable at: _[fill in public URL/port]_
+2. `bash setup.sh` (venv + `pip install -r requirements.txt`)
+3. Created `.env` directly on the instance with `DASHSCOPE_API_KEY` (never committed to git)
+4. Opened inbound TCP 5002 (and 5003 for the API) in the instance's Security Group
+5. Ran `python web_ui.py` (via `tmux`, persistent) and `python main.py --client graub_ai` on the instance
+6. Confirmed reachable at `http://8.218.50.36:5002/`
 
 ## Screenshot
-_[attach the Alibaba Cloud ECS console screenshot here — see "What's actually required" above]_
+![Alibaba Cloud ECS console showing the Graub AI instance running](alibaba_cloud_deployment_proof.png)
+
+Alibaba Cloud ECS console, Instances overview, China (Hong Kong) region — instance `i-j6c12usttl4umkx8hb5m` shown as **Running**, public IP `8.218.50.36`.
 
